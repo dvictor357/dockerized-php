@@ -17,6 +17,8 @@ services:
       - php80
       - php81
       - php82
+      - php83
+      - php84
     networks:
       - app-network
     restart: unless-stopped
@@ -63,6 +65,28 @@ services:
       context: ./php/8.2
       dockerfile: Dockerfile
     container_name: php82
+    volumes:
+      - ./projects:/var/www/html
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  php83:
+    build:
+      context: ./php/8.3
+      dockerfile: Dockerfile
+    container_name: php83
+    volumes:
+      - ./projects:/var/www/html
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  php84:
+    build:
+      context: ./php/8.4
+      dockerfile: Dockerfile
+    container_name: php84
     volumes:
       - ./projects:/var/www/html
     networks:
