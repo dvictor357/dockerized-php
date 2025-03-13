@@ -147,6 +147,34 @@ else
   echo -e "sudo sh -c 'echo \"127.0.0.1 $DOMAIN\" >> /etc/hosts'"
 fi
 
+# Function to update Laravel .env file
+update_laravel_env() {
+  local env_file="projects/$PROJECT_NAME/.env"
+  
+  if [ -f "$env_file" ]; then
+    echo -e "${BLUE}Updating Laravel .env file with Docker environment settings...${NC}"
+    
+    # Create a backup of the original .env file
+    cp "$env_file" "${env_file}.backup"
+    
+    # Update database settings
+    sed -i "s/DB_CONNECTION=.*/DB_CONNECTION=mysql/" "$env_file"
+    sed -i "s/DB_HOST=.*/DB_HOST=mysql$MYSQL_VERSION/" "$env_file"
+    sed -i "s/DB_PORT=.*/DB_PORT=3306/" "$env_file"
+    sed -i "s/DB_DATABASE=.*/DB_DATABASE=${PROJECT_NAME//-/_}/" "$env_file"
+    sed -i "s/DB_USERNAME=.*/DB_USERNAME=dbuser/" "$env_file"
+    sed -i "s/DB_PASSWORD=.*/DB_PASSWORD=dbpassword/" "$env_file"
+    
+    # Update APP_URL
+    sed -i "s|APP_URL=.*|APP_URL=http://$DOMAIN|" "$env_file"
+    
+    echo -e "${GREEN}✓ Laravel .env file updated${NC}"
+    echo -e "${BLUE}A backup of the original .env file has been saved as ${env_file}.backup${NC}"
+  else
+    echo -e "${RED}Warning: Laravel .env file not found. Skipping environment configuration.${NC}"
+  fi
+}
+
 # Install project
 echo -e "${BLUE}Setting up $PROJECT_TYPE project...${NC}"
 if [ "$PROJECT_TYPE" == "laravel" ]; then
@@ -167,6 +195,9 @@ if [ "$PROJECT_TYPE" == "laravel" ]; then
       
       if [ $? -eq 0 ]; then
         echo -e "${GREEN}✓ Laravel project created successfully${NC}"
+        
+        # Update the Laravel .env file
+        update_laravel_env
       else
         echo -e "${RED}Error: Failed to create Laravel project with Composer.${NC}"
         echo -e "${BLUE}You can try the Docker container method instead:${NC}"
@@ -176,15 +207,18 @@ if [ "$PROJECT_TYPE" == "laravel" ]; then
   else
     echo -e "${BLUE}Run the following command to install Laravel using Docker:${NC}"
     echo -e "docker-compose exec php$PHP_VERSION bash -c \"cd /var/www/html/$PROJECT_NAME && composer create-project laravel/laravel .\""
+    echo -e "${BLUE}After installation, you should update the .env file with these database settings:${NC}"
+    echo -e "DB_CONNECTION=mysql"
+    echo -e "DB_HOST=mysql$MYSQL_VERSION"
+    echo -e "DB_PORT=3306"
+    echo -e "DB_DATABASE=${PROJECT_NAME//-/_}"
+    echo -e "DB_USERNAME=dbuser"
+    echo -e "DB_PASSWORD=dbpassword"
+    echo -e "APP_URL=http://$DOMAIN"
+    
+    echo -e "${BLUE}Or run this command to automatically update the .env file:${NC}"
+    echo -e "docker-compose exec php$PHP_VERSION bash -c \"cd /var/www/html/$PROJECT_NAME && sed -i 's/DB_CONNECTION=.*/DB_CONNECTION=mysql/' .env && sed -i 's/DB_HOST=.*/DB_HOST=mysql$MYSQL_VERSION/' .env && sed -i 's/DB_PORT=.*/DB_PORT=3306/' .env && sed -i 's/DB_DATABASE=.*/DB_DATABASE=${PROJECT_NAME//-/_}/' .env && sed -i 's/DB_USERNAME=.*/DB_USERNAME=dbuser/' .env && sed -i 's/DB_PASSWORD=.*/DB_PASSWORD=dbpassword/' .env && sed -i 's|APP_URL=.*|APP_URL=http://$DOMAIN|' .env\""
   fi
-  
-  echo -e "${BLUE}After installation, update your .env file with these database settings:${NC}"
-  echo -e "DB_CONNECTION=mysql"
-  echo -e "DB_HOST=mysql$MYSQL_VERSION"
-  echo -e "DB_PORT=3306"
-  echo -e "DB_DATABASE=${PROJECT_NAME//-/_}"
-  echo -e "DB_USERNAME=dbuser"
-  echo -e "DB_PASSWORD=dbpassword"
 else
   echo -e "${BLUE}Installing WordPress...${NC}"
   echo -e "${BLUE}Run the following command to install WordPress:${NC}"

@@ -135,6 +135,8 @@ The easiest way to add a new project is to use the included helper script:
    ./add-project.sh --type laravel --name my-laravel-project --domain myapp.local --php 80 --mysql 80 --use-composer
    ```
 
+   This will automatically create the Laravel project and configure the `.env` file with the correct database settings for your Docker environment.
+
 6. Follow the instructions provided by the script to complete the setup.
 
 ### Manual Setup for Laravel Projects
@@ -151,6 +153,12 @@ The easiest way to add a new project is to use the included helper script:
 
    ```
    docker-compose exec php80 bash -c "cd /var/www/html/my-laravel-project && composer create-project laravel/laravel ."
+   ```
+
+   After installation, you can automatically configure the Laravel `.env` file for Docker:
+
+   ```
+   docker-compose exec php80 bash -c "cd /var/www/html/my-laravel-project && sed -i 's/DB_CONNECTION=.*/DB_CONNECTION=mysql/' .env && sed -i 's/DB_HOST=.*/DB_HOST=mysql80/' .env && sed -i 's/DB_PORT=.*/DB_PORT=3306/' .env && sed -i 's/DB_DATABASE=.*/DB_DATABASE=my_laravel_project/' .env && sed -i 's/DB_USERNAME=.*/DB_USERNAME=dbuser/' .env && sed -i 's/DB_PASSWORD=.*/DB_PASSWORD=dbpassword/' .env && sed -i 's|APP_URL=.*|APP_URL=http://your-domain.local|' .env"
    ```
 
    **Using Composer directly (if installed on your host machine):**
@@ -279,25 +287,25 @@ fastcgi_pass php84:9000;  # For PHP 8.4
 1. Create a new directory for the PHP version:
 
    ```
-   mkdir -p php/8.3
+   mkdir -p php/8.5
    ```
 
 2. Create a Dockerfile for the new PHP version:
 
    ```
-   # php/8.3/Dockerfile
-   FROM php:8.3-fpm
+   # php/8.5/Dockerfile
+   FROM php:8.5-fpm
    # ... (copy from an existing Dockerfile and adjust as needed)
    ```
 
 3. Add the new service to `docker-compose.yml`:
 
    ```yaml
-   php83:
+   php85:
      build:
-       context: ./php/8.3
+       context: ./php/8.5
        dockerfile: Dockerfile
-     container_name: php83
+     container_name: php85
      volumes:
        - ./projects:/var/www/html
      networks:
@@ -378,7 +386,7 @@ docker-compose logs nginx
 To check PHP logs:
 
 ```
-docker-compose logs php80  # or php74, php81, php82
+docker-compose logs php80  # or php74, php81, php82, php83, php84
 ```
 
 ## License
