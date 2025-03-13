@@ -20,7 +20,7 @@ show_help() {
   echo "  -t, --type        Project type (laravel or wordpress)"
   echo "  -n, --name        Project name (folder name)"
   echo "  -d, --domain      Domain name for the project"
-  echo "  -p, --php         PHP version to use (74, 80, 81, 82)"
+  echo "  -p, --php         PHP version to use (74, 80, 81, 82, 83, 84)"
   echo "  -m, --mysql       MySQL version to use (57, 80)"
   echo "  -u, --update-hosts Update hosts file (requires sudo)"
   echo "  -c, --use-composer Use composer directly for Laravel projects"
@@ -29,7 +29,7 @@ show_help() {
   echo -e "${BLUE}Example:${NC}"
   echo "  $0 --type laravel --name my-app --domain myapp.local --php 81 --mysql 80"
   echo "  $0 --type wordpress --name blog --domain blog.local --php 74 --mysql 57 --update-hosts"
-  echo "  $0 --type laravel --name my-app --domain myapp.local --php 81 --mysql 80 --use-composer"
+  echo "  $0 --type laravel --name my-app --domain myapp.local --php 83 --mysql 80 --use-composer"
   exit 0
 }
 
@@ -93,8 +93,8 @@ if [ "$PROJECT_TYPE" != "laravel" ] && [ "$PROJECT_TYPE" != "wordpress" ]; then
 fi
 
 # Validate PHP version
-if [ "$PHP_VERSION" != "74" ] && [ "$PHP_VERSION" != "80" ] && [ "$PHP_VERSION" != "81" ] && [ "$PHP_VERSION" != "82" ]; then
-  echo -e "${RED}Error: PHP version must be '74', '80', '81', or '82'${NC}"
+if [ "$PHP_VERSION" != "74" ] && [ "$PHP_VERSION" != "80" ] && [ "$PHP_VERSION" != "81" ] && [ "$PHP_VERSION" != "82" ] && [ "$PHP_VERSION" != "83" ] && [ "$PHP_VERSION" != "84" ]; then
+  echo -e "${RED}Error: PHP version must be '74', '80', '81', '82', '83', or '84'${NC}"
   exit 1
 fi
 

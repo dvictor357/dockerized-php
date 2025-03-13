@@ -4,7 +4,7 @@ A Docker-based development environment for multiple PHP projects (Laravel and Wo
 
 ## Features
 
-- Support for multiple PHP versions (7.4, 8.0, 8.1, 8.2)
+- Support for multiple PHP versions (7.4, 8.0, 8.1, 8.2, 8.3, 8.4)
 - Support for multiple MySQL versions (5.7, 8.0)
 - Nginx as a web server
 - phpMyAdmin for database management
@@ -61,7 +61,11 @@ You can use this repository as a boilerplate for your own projects:
 │   │   └── Dockerfile
 │   ├── 8.1
 │   │   └── Dockerfile
-│   └── 8.2
+│   ├── 8.2
+│   │   └── Dockerfile
+│   ├── 8.3
+│   │   └── Dockerfile
+│   └── 8.4
 │       └── Dockerfile
 └── projects
     ├── project1
@@ -168,7 +172,7 @@ The easiest way to add a new project is to use the included helper script:
    # Replace these placeholders in the file
    # PROJECT_DOMAIN -> your-domain.local
    # PROJECT_NAME -> my-laravel-project
-   # PHP_VERSION -> php80 (or php74, php81, php82)
+   # PHP_VERSION -> php80 (or php74, php81, php82, php83, php84)
    ```
 
 5. Add the domain to your hosts file:
@@ -208,7 +212,7 @@ The easiest way to add a new project is to use the included helper script:
    # Replace these placeholders in the file
    # PROJECT_DOMAIN -> your-wp-domain.local
    # PROJECT_NAME -> my-wordpress-site
-   # PHP_VERSION -> php74 (or php80, php81, php82)
+   # PHP_VERSION -> php74 (or php80, php81, php82, php83, php84)
    ```
 
 5. Add the domain to your hosts file:
@@ -266,6 +270,8 @@ fastcgi_pass php74:9000;  # For PHP 7.4
 fastcgi_pass php80:9000;  # For PHP 8.0
 fastcgi_pass php81:9000;  # For PHP 8.1
 fastcgi_pass php82:9000;  # For PHP 8.2
+fastcgi_pass php83:9000;  # For PHP 8.3
+fastcgi_pass php84:9000;  # For PHP 8.4
 ```
 
 ## Adding a New PHP Version
