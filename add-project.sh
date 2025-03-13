@@ -6,8 +6,9 @@ BLUE='\033[0;34m'
 RED='\033[0;31m'
 NC='\033[0m' # No Color
 
-# Default value for update_hosts
+# Default values
 UPDATE_HOSTS=false
+USE_COMPOSER_DIRECTLY=false
 
 # Function to display help
 show_help() {
@@ -22,11 +23,13 @@ show_help() {
   echo "  -p, --php         PHP version to use (74, 80, 81, 82)"
   echo "  -m, --mysql       MySQL version to use (57, 80)"
   echo "  -u, --update-hosts Update hosts file (requires sudo)"
+  echo "  -c, --use-composer Use composer directly for Laravel projects"
   echo "  -h, --help        Show this help message"
   echo ""
   echo -e "${BLUE}Example:${NC}"
   echo "  $0 --type laravel --name my-app --domain myapp.local --php 81 --mysql 80"
   echo "  $0 --type wordpress --name blog --domain blog.local --php 74 --mysql 57 --update-hosts"
+  echo "  $0 --type laravel --name my-app --domain myapp.local --php 81 --mysql 80 --use-composer"
   exit 0
 }
 
@@ -61,6 +64,10 @@ while [[ $# -gt 0 ]]; do
       ;;
     -u|--update-hosts)
       UPDATE_HOSTS=true
+      shift
+      ;;
+    -c|--use-composer)
+      USE_COMPOSER_DIRECTLY=true
       shift
       ;;
     -h|--help)
@@ -144,8 +151,33 @@ fi
 echo -e "${BLUE}Setting up $PROJECT_TYPE project...${NC}"
 if [ "$PROJECT_TYPE" == "laravel" ]; then
   echo -e "${BLUE}Installing Laravel...${NC}"
-  echo -e "${BLUE}Run the following command to install Laravel:${NC}"
-  echo -e "docker-compose exec php$PHP_VERSION bash -c \"cd /var/www/html/$PROJECT_NAME && composer create-project laravel/laravel .\""
+  
+  if [ "$USE_COMPOSER_DIRECTLY" = true ]; then
+    # Check if composer is installed
+    if ! command -v composer &> /dev/null; then
+      echo -e "${RED}Error: Composer is not installed or not in your PATH.${NC}"
+      echo -e "${BLUE}Please install Composer or use the Docker container method instead.${NC}"
+      echo -e "${BLUE}For Docker container method, run the script without the --use-composer flag.${NC}"
+    else
+      echo -e "${BLUE}Using Composer directly to create Laravel project...${NC}"
+      echo -e "${BLUE}Running: composer create-project laravel/laravel projects/$PROJECT_NAME${NC}"
+      
+      # Navigate to the parent directory and run composer
+      (cd projects && composer create-project laravel/laravel $PROJECT_NAME)
+      
+      if [ $? -eq 0 ]; then
+        echo -e "${GREEN}✓ Laravel project created successfully${NC}"
+      else
+        echo -e "${RED}Error: Failed to create Laravel project with Composer.${NC}"
+        echo -e "${BLUE}You can try the Docker container method instead:${NC}"
+        echo -e "docker-compose exec php$PHP_VERSION bash -c \"cd /var/www/html/$PROJECT_NAME && composer create-project laravel/laravel .\""
+      fi
+    fi
+  else
+    echo -e "${BLUE}Run the following command to install Laravel using Docker:${NC}"
+    echo -e "docker-compose exec php$PHP_VERSION bash -c \"cd /var/www/html/$PROJECT_NAME && composer create-project laravel/laravel .\""
+  fi
+  
   echo -e "${BLUE}After installation, update your .env file with these database settings:${NC}"
   echo -e "DB_CONNECTION=mysql"
   echo -e "DB_HOST=mysql$MYSQL_VERSION"

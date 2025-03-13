@@ -125,7 +125,13 @@ The easiest way to add a new project is to use the included helper script:
    sudo ./add-project.sh --type laravel --name my-laravel-project --domain myapp.local --php 80 --mysql 80 --update-hosts
    ```
 
-5. Follow the instructions provided by the script to complete the setup.
+5. For Laravel projects, you can use Composer directly if it's installed on your host machine:
+
+   ```
+   ./add-project.sh --type laravel --name my-laravel-project --domain myapp.local --php 80 --mysql 80 --use-composer
+   ```
+
+6. Follow the instructions provided by the script to complete the setup.
 
 ### Manual Setup for Laravel Projects
 
@@ -135,10 +141,19 @@ The easiest way to add a new project is to use the included helper script:
    mkdir -p projects/my-laravel-project
    ```
 
-2. Install Laravel in the project directory:
+2. Install Laravel in the project directory using one of these methods:
+
+   **Using Docker container (recommended):**
 
    ```
    docker-compose exec php80 bash -c "cd /var/www/html/my-laravel-project && composer create-project laravel/laravel ."
+   ```
+
+   **Using Composer directly (if installed on your host machine):**
+
+   ```
+   cd projects
+   composer create-project laravel/laravel my-laravel-project
    ```
 
 3. Create a Nginx configuration file for the project:
