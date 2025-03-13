@@ -1,0 +1,123 @@
+version: "3.8"
+
+services:
+  # Nginx service for handling web requests
+  nginx:
+    image: nginx:alpine
+    container_name: nginx-proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./nginx/ssl:/etc/nginx/ssl
+      - ./projects:/var/www/html
+    depends_on:
+      - php74
+      - php80
+      - php81
+      - php82
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  # PHP 7.4
+  php74:
+    build:
+      context: ./php/7.4
+      dockerfile: Dockerfile
+    container_name: php74
+    volumes:
+      - ./projects:/var/www/html
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  # PHP 8.0
+  php80:
+    build:
+      context: ./php/8.0
+      dockerfile: Dockerfile
+    container_name: php80
+    volumes:
+      - ./projects:/var/www/html
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  # PHP 8.1
+  php81:
+    build:
+      context: ./php/8.1
+      dockerfile: Dockerfile
+    container_name: php81
+    volumes:
+      - ./projects:/var/www/html
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  # PHP 8.2
+  php82:
+    build:
+      context: ./php/8.2
+      dockerfile: Dockerfile
+    container_name: php82
+    volumes:
+      - ./projects:/var/www/html
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  # MySQL 5.7
+  mysql57:
+    image: mysql:5.7
+    container_name: mysql57
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpassword}
+      MYSQL_USER: ${MYSQL_USER:-dbuser}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-dbpassword}
+    volumes:
+      - mysql57_data:/var/lib/mysql
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  # MySQL 8.0
+  mysql80:
+    image: mysql:8.0
+    container_name: mysql80
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpassword}
+      MYSQL_USER: ${MYSQL_USER:-dbuser}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-dbpassword}
+    volumes:
+      - mysql80_data:/var/lib/mysql
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  # phpMyAdmin
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    environment:
+      PMA_HOSTS: mysql57,mysql80
+      PMA_PORT: 3306
+      UPLOAD_LIMIT: 300M
+    ports:
+      - "8080:80"
+    depends_on:
+      - mysql57
+      - mysql80
+    networks:
+      - app-network
+    restart: unless-stopped
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  mysql57_data:
+  mysql80_data:

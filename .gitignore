@@ -1,0 +1,23 @@
+# Docker volumes
+/data
+
+# Project directories
+/projects/*
+!/projects/.gitkeep
+
+# Environment variables
+.env.local
+.env.*.local
+
+# IDE files
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log 
