@@ -11,6 +11,37 @@ A Docker-based development environment for multiple PHP projects (Laravel and Wo
 - Project isolation with separate configurations
 - Easy to add new projects
 
+## Using as a Boilerplate
+
+You can use this repository as a boilerplate for your own projects:
+
+1. Clone the repository:
+
+   ```
+   git clone https://github.com/yourusername/dockerized-php.git my-php-environment
+   cd my-php-environment
+   ```
+
+2. Remove the existing Git history and initialize a new repository:
+
+   ```
+   rm -rf .git
+   git init
+   git add .
+   git commit -m "Initial commit"
+   ```
+
+3. Create a new repository on GitHub or another Git hosting service
+
+4. Add your remote repository and push:
+
+   ```
+   git remote add origin https://github.com/yourusername/your-new-repo.git
+   git push -u origin main
+   ```
+
+5. Customize the environment variables in `.env` file and start using it!
+
 ## Directory Structure
 
 ```
