@@ -4,7 +4,7 @@ A Docker-based development environment for multiple PHP projects (Laravel and Wo
 
 ## Features
 
-- Support for multiple PHP versions (7.4, 8.0, 8.1, 8.2)
+- Support for multiple PHP versions (7.4, 8.0, 8.1, 8.2, 8.3, 8.4)
 - Support for multiple MySQL versions (5.7, 8.0)
 - Nginx as a web server
 - phpMyAdmin for database management
@@ -61,7 +61,11 @@ You can use this repository as a boilerplate for your own projects:
 │   │   └── Dockerfile
 │   ├── 8.1
 │   │   └── Dockerfile
-│   └── 8.2
+│   ├── 8.2
+│   │   └── Dockerfile
+│   ├── 8.3
+│   │   └── Dockerfile
+│   └── 8.4
 │       └── Dockerfile
 └── projects
     ├── project1
@@ -125,7 +129,15 @@ The easiest way to add a new project is to use the included helper script:
    sudo ./add-project.sh --type laravel --name my-laravel-project --domain myapp.local --php 80 --mysql 80 --update-hosts
    ```
 
-5. Follow the instructions provided by the script to complete the setup.
+5. For Laravel projects, you can use Composer directly if it's installed on your host machine:
+
+   ```
+   ./add-project.sh --type laravel --name my-laravel-project --domain myapp.local --php 80 --mysql 80 --use-composer
+   ```
+
+   This will automatically create the Laravel project and configure the `.env` file with the correct database settings for your Docker environment.
+
+6. Follow the instructions provided by the script to complete the setup.
 
 ### Manual Setup for Laravel Projects
 
@@ -135,10 +147,25 @@ The easiest way to add a new project is to use the included helper script:
    mkdir -p projects/my-laravel-project
    ```
 
-2. Install Laravel in the project directory:
+2. Install Laravel in the project directory using one of these methods:
+
+   **Using Docker container (recommended):**
 
    ```
    docker-compose exec php80 bash -c "cd /var/www/html/my-laravel-project && composer create-project laravel/laravel ."
+   ```
+
+   After installation, you can automatically configure the Laravel `.env` file for Docker:
+
+   ```
+   docker-compose exec php80 bash -c "cd /var/www/html/my-laravel-project && sed -i 's/DB_CONNECTION=.*/DB_CONNECTION=mysql/' .env && sed -i 's/DB_HOST=.*/DB_HOST=mysql80/' .env && sed -i 's/DB_PORT=.*/DB_PORT=3306/' .env && sed -i 's/DB_DATABASE=.*/DB_DATABASE=my_laravel_project/' .env && sed -i 's/DB_USERNAME=.*/DB_USERNAME=dbuser/' .env && sed -i 's/DB_PASSWORD=.*/DB_PASSWORD=dbpassword/' .env && sed -i 's|APP_URL=.*|APP_URL=http://your-domain.local|' .env"
+   ```
+
+   **Using Composer directly (if installed on your host machine):**
+
+   ```
+   cd projects
+   composer create-project laravel/laravel my-laravel-project
    ```
 
 3. Create a Nginx configuration file for the project:
@@ -153,7 +180,7 @@ The easiest way to add a new project is to use the included helper script:
    # Replace these placeholders in the file
    # PROJECT_DOMAIN -> your-domain.local
    # PROJECT_NAME -> my-laravel-project
-   # PHP_VERSION -> php80 (or php74, php81, php82)
+   # PHP_VERSION -> php80 (or php74, php81, php82, php83, php84)
    ```
 
 5. Add the domain to your hosts file:
@@ -193,7 +220,7 @@ The easiest way to add a new project is to use the included helper script:
    # Replace these placeholders in the file
    # PROJECT_DOMAIN -> your-wp-domain.local
    # PROJECT_NAME -> my-wordpress-site
-   # PHP_VERSION -> php74 (or php80, php81, php82)
+   # PHP_VERSION -> php74 (or php80, php81, php82, php83, php84)
    ```
 
 5. Add the domain to your hosts file:
@@ -251,6 +278,8 @@ fastcgi_pass php74:9000;  # For PHP 7.4
 fastcgi_pass php80:9000;  # For PHP 8.0
 fastcgi_pass php81:9000;  # For PHP 8.1
 fastcgi_pass php82:9000;  # For PHP 8.2
+fastcgi_pass php83:9000;  # For PHP 8.3
+fastcgi_pass php84:9000;  # For PHP 8.4
 ```
 
 ## Adding a New PHP Version
@@ -258,25 +287,25 @@ fastcgi_pass php82:9000;  # For PHP 8.2
 1. Create a new directory for the PHP version:
 
    ```
-   mkdir -p php/8.3
+   mkdir -p php/8.5
    ```
 
 2. Create a Dockerfile for the new PHP version:
 
    ```
-   # php/8.3/Dockerfile
-   FROM php:8.3-fpm
+   # php/8.5/Dockerfile
+   FROM php:8.5-fpm
    # ... (copy from an existing Dockerfile and adjust as needed)
    ```
 
 3. Add the new service to `docker-compose.yml`:
 
    ```yaml
-   php83:
+   php85:
      build:
-       context: ./php/8.3
+       context: ./php/8.5
        dockerfile: Dockerfile
-     container_name: php83
+     container_name: php85
      volumes:
        - ./projects:/var/www/html
      networks:
@@ -357,7 +386,7 @@ docker-compose logs nginx
 To check PHP logs:
 
 ```
-docker-compose logs php80  # or php74, php81, php82
+docker-compose logs php80  # or php74, php81, php82, php83, php84
 ```
 
 ## License
